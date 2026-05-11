@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tharros AI — AI Receptionist for Moving Companies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:          #0f0f0f;
+      --bg-card:     #1c1c1c;
+      --bg-card-alt: #1a1a1a;
+      --border:      #2a2a2a;
+      --border-accent: rgba(74,144,217,0.35);
+      --text:        #ededed;
+      --text-muted:  #9a9a9a;
+      --text-dim:    #666;
+      --accent:      #4A90D9;
+      --accent-dim:  #3a75b8;
+      --font:        'Manrope', sans-serif;
+      --max-w:       1080px;
+      --max-video:   860px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: #fff; }
+
+    /* =========================================
+       SCROLL ANIMATION
+    ========================================= */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =========================================
+       TOP BAR
+    ========================================= */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-wordmark {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .topbar-badge {
+      background: rgba(74,144,217,0.12);
+      border: 1px solid rgba(74,144,217,0.25);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+
+    .topbar-link {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .topbar-link:hover { color: var(--text); }
+
+    .topbar-dot {
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    /* =========================================
+       SHARED LAYOUT
+    ========================================= */
+    .section { padding: 72px 24px; }
+
+    .section-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-headline {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 40px;
+    }
+
+    /* =========================================
+       HERO
+    ========================================= */
+    #hero {
+      padding: 88px 24px 64px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-inner {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 22px;
+      padding: 6px 14px;
+      border: 1px solid rgba(74,144,217,0.3);
+      border-radius: 99px;
+      background: rgba(74,144,217,0.07);
+    }
+
+    .hero-eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    .hero-headline {
+      font-size: clamp(30px, 5.5vw, 52px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.2vw, 18px);
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 620px;
+      margin-bottom: 28px;
+    }
+
+    .hero-nudge {
+      font-size: 14px;
+      color: var(--text-dim);
+      letter-spacing: 0.01em;
+    }
+
+    /* =========================================
+       VIDEO SECTION
+    ========================================= */
+    #video {
+      padding: 56px 24px 64px;
+      background: #0c0c0c;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .video-inner {
+      max-width: var(--max-video);
+      margin: 0 auto;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #161616;
+      border: 1px solid var(--border-accent);
+      box-shadow: 0 0 0 1px rgba(74,144,217,0.1), 0 24px 64px rgba(0,0,0,0.6), 0 0 80px rgba(74,144,217,0.06);
+    }
+
+    /* Replace the inner div with <video> or <iframe> when ready */
+    .video-placeholder-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background: radial-gradient(ellipse at 50% 60%, rgba(74,144,217,0.07) 0%, transparent 70%);
+    }
+
+    .video-play-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 12px rgba(74,144,217,0.12), 0 8px 32px rgba(74,144,217,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .video-play-btn:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 0 16px rgba(74,144,217,0.15), 0 8px 40px rgba(74,144,217,0.4);
+    }
+
+    .video-play-btn svg {
+      width: 26px;
+      height: 26px;
+      fill: #fff;
+      margin-left: 3px;
+    }
+
+    .video-placeholder-text {
+      text-align: center;
+    }
+
+    .video-placeholder-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .video-placeholder-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .video-duration-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    .video-caption {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+
+    /* =========================================
+       DEMO CHECKLIST — directly under video
+    ========================================= */
+    #demo-preview {
+      padding: 0 24px 64px;
+      background: #0c0c0c;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-preview-inner {
+      max-width: var(--max-video);
+      margin: 0 auto;
+    }
+
+    .demo-preview-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .checklist {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 32px;
+    }
+
+    @media (max-width: 560px) {
+      .checklist { grid-template-columns: 1fr; }
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .checklist-check {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .checklist-check svg { width: 15px; height: 15px; }
+
+    /* =========================================
+       WHY MOVING COMPANIES LOSE CALLS
+    ========================================= */
+    #why { border-bottom: 1px solid var(--border); }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    @media (max-width: 560px) { .why-grid { grid-template-columns: 1fr; } }
+
+    .why-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    .why-item:hover { border-color: #3a3a3a; }
+
+    .why-icon {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .why-standout {
+      font-size: clamp(16px, 2.5vw, 20px);
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.5;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* =========================================
+       HOW IT WORKS — 3 STEPS
+    ========================================= */
+    #steps { border-bottom: 1px solid var(--border); }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 700px) { .steps-grid { grid-template-columns: 1fr; } }
+
+    .step-card {
+      padding: 28px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s;
+    }
+    .step-card:hover { border-color: #3a3a3a; }
+
+    .step-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .step-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .step-body {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* =========================================
+       TRANSCRIPT CARDS
+    ========================================= */
+    #transcripts { border-bottom: 1px solid var(--border); }
+
+    .transcripts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 760px) { .transcripts-grid { grid-template-columns: 1fr; } }
+
+    .transcript-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s;
+    }
+    .transcript-card:hover { border-color: var(--border-accent); }
+
+    .transcript-line { font-size: 13.5px; line-height: 1.55; }
+
+    .transcript-speaker {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .speaker-customer { color: var(--text-dim); }
+    .speaker-ai       { color: var(--accent); }
+
+    .transcript-text-customer { color: var(--text-muted); }
+    .transcript-text-ai       { color: var(--text); }
+
+    .transcript-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* =========================================
+       WHAT THIS HANDLES
+    ========================================= */
+    #handles { border-bottom: 1px solid var(--border); }
+
+    .handles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 560px) { .handles-grid { grid-template-columns: 1fr; } }
+
+    .handle-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      padding: 14px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .handle-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* =========================================
+       CALCULATOR
+    ========================================= */
+    #calculator {
+      border-bottom: 1px solid var(--border);
+      background: #0c0c0c;
+    }
+
+    .calc-inner {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .calc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px 24px;
+      margin-bottom: 12px;
+    }
+
+    .calc-sg { margin-bottom: 24px; }
+    .calc-sg:last-child { margin-bottom: 0; }
+
+    .calc-sg-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .calc-sg-label { font-size: 13px; color: var(--text-muted); }
+    .calc-sg-val { font-size: 14px; font-weight: 600; color: var(--accent); }
+
+    .calc-divider { height: 1px; background: var(--border); margin: 0 0 24px; }
+
+    input[type="range"].calc-range {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 3px;
+      background: #2a2a2a;
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+      border: none;
+    }
+
+    input[type="range"].calc-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2.5px solid var(--bg-card);
+      box-shadow: 0 0 0 1px rgba(74,144,217,0.3);
+      transition: box-shadow 0.15s;
+    }
+
+    input[type="range"].calc-range::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 5px rgba(74,144,217,0.15);
+    }
+
+    input[type="range"].calc-range::-moz-range-thumb {
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2.5px solid var(--bg-card);
+    }
+
+    .calc-tabs {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .calc-tab {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.03em;
+    }
+
+    .calc-tab:hover { border-color: var(--accent); color: var(--accent); }
+    .calc-tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .calc-result {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .calc-r-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+
+    .calc-r-amount {
+      font-size: 54px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .calc-r-formula {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .calc-r-tagline {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    .calc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .calc-stat {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    .calc-stat-l { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+    .calc-stat-v { font-size: 20px; font-weight: 700; color: var(--text); }
+
+    /* =========================================
+       PROOF / FOUNDER
+    ========================================= */
+    #founder { border-bottom: 1px solid var(--border); }
+
+    .founder-body {
+      max-width: 660px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .founder-p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .proof-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(74,144,217,0.25);
+      border-radius: 8px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 500px) { .proof-card { grid-template-columns: 1fr; } }
+
+    .proof-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .proof-stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .proof-stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    .proof-stat-value .dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 6px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+    }
+
+    .founder-follow {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .founder-sig {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    /* =========================================
+       ACCORDION (OBJECTIONS)
+    ========================================= */
+    #objections { border-bottom: 1px solid var(--border); }
+
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .accordion-item { border-bottom: 1px solid var(--border); }
+    .accordion-item:last-child { border-bottom: none; }
+
+    .accordion-trigger {
+      width: 100%;
+      background: var(--bg-card);
+      border: none;
+      padding: 18px 22px;
+      text-align: left;
+      font-family: var(--font);
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .accordion-trigger:hover { background: #222; color: #fff; }
+
+    .accordion-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid var(--text-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, transform 0.25s;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .accordion-trigger[aria-expanded="true"] .accordion-icon {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(45deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: var(--bg);
+    }
+
+    .accordion-body.open { max-height: 200px; }
+
+    .accordion-body-inner {
+      padding: 16px 22px 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    /* =========================================
+       BEFORE OUR CALL
+    ========================================= */
+    #reschedule { border-bottom: 1px solid var(--border); }
+
+    .before-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .before-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .before-list li::before {
+      content: '—';
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .cal-links {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+    }
+
+    .cal-links a {
+      color: var(--text-dim);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .cal-links a:hover { color: var(--text); }
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+    #footer {
+      padding: 44px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .footer-wordmark {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .footer-tagline {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .footer-email {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .footer-email a { color: var(--text-dim); }
+    .footer-email a:hover { color: var(--text); }
+
+    /* =========================================
+       STAGGER DELAYS
+    ========================================= */
+    .why-item:nth-child(1)  { transition-delay: 0.00s; }
+    .why-item:nth-child(2)  { transition-delay: 0.05s; }
+    .why-item:nth-child(3)  { transition-delay: 0.10s; }
+    .why-item:nth-child(4)  { transition-delay: 0.15s; }
+    .why-item:nth-child(5)  { transition-delay: 0.20s; }
+    .why-item:nth-child(6)  { transition-delay: 0.25s; }
+
+    .step-card:nth-child(1) { transition-delay: 0.00s; }
+    .step-card:nth-child(2) { transition-delay: 0.07s; }
+    .step-card:nth-child(3) { transition-delay: 0.14s; }
+
+    .transcript-card:nth-child(1) { transition-delay: 0.00s; }
+    .transcript-card:nth-child(2) { transition-delay: 0.07s; }
+    .transcript-card:nth-child(3) { transition-delay: 0.14s; }
+
+    .handle-item:nth-child(1) { transition-delay: 0.00s; }
+    .handle-item:nth-child(2) { transition-delay: 0.04s; }
+    .handle-item:nth-child(3) { transition-delay: 0.08s; }
+    .handle-item:nth-child(4) { transition-delay: 0.12s; }
+    .handle-item:nth-child(5) { transition-delay: 0.16s; }
+    .handle-item:nth-child(6) { transition-delay: 0.20s; }
+    .handle-item:nth-child(7) { transition-delay: 0.24s; }
+    .handle-item:nth-child(8) { transition-delay: 0.28s; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header id="topbar" role="banner">
+    <span class="topbar-wordmark">Tharros AI</span>
+    <div class="topbar-right">
+      <span class="topbar-badge">Call booked</span>
+      <span class="topbar-dot">·</span>
+      <a href="https://calendly.com/lucas-tharrosai/ai-receptionist" class="topbar-link">Need to reschedule?</a>
+    </div>
+  </header>
+
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow fade-up">
+        <span class="hero-eyebrow-dot"></span>
+        Your call is booked — watch this before we meet
+      </div>
+      <h1 class="hero-headline fade-up">
+        When you miss the call, another mover books the job.
+      </h1>
+      <p class="hero-sub fade-up">
+        Tharros answers when your office can't, qualifies the move, filters out spam, books the estimate, and sends your team the full summary — so real leads don't hit voicemail.
+      </p>
+      <p class="hero-nudge fade-up">Watch the quick demo below. It'll make our call faster and more useful.</p>
+    </div>
+  </section>
+
+
+  <!-- VIDEO SECTION -->
+  <section id="video">
+    <div class="video-inner">
+      <div class="video-wrapper fade-up">
+        <video
+          src="https://raw.githubusercontent.com/tharrosAI/movingDEMO/main/Mover%20VSL%20(1).mp4"
+          controls
+          style="width:100%;height:100%;object-fit:cover;display:block;"
+          preload="metadata"
+        ></video>
+        <div class="video-duration-badge">1:30 demo</div>
+      </div>
+
+      <p class="video-caption fade-up">Real call flow. Real lead qualification. Booked automatically.</p>
+    </div>
+  </section>
+
+
+  <!-- DEMO CHECKLIST — directly under video -->
+  <section id="demo-preview">
+    <div class="demo-preview-inner">
+      <p class="demo-preview-label fade-up">In this demo, you'll hear:</p>
+      <ul class="checklist fade-up" aria-label="Demo preview checklist">
+        <li>
+          <span class="checklist-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="2.25" stroke="#4A90D9" stroke-width="1.5"/>
+              <path d="M4 8.5L6.5 11L12 5.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          How Tharros sounds on the phone
+        </li>
+        <li>
+          <span class="checklist-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="2.25" stroke="#4A90D9" stroke-width="1.5"/>
+              <path d="M4 8.5L6.5 11L12 5.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          The questions it asks a moving lead
+        </li>
+        <li>
+          <span class="checklist-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="2.25" stroke="#4A90D9" stroke-width="1.5"/>
+              <path d="M4 8.5L6.5 11L12 5.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          How it handles pricing questions
+        </li>
+        <li>
+          <span class="checklist-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="2.25" stroke="#4A90D9" stroke-width="1.5"/>
+              <path d="M4 8.5L6.5 11L12 5.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          How it books the estimate
+        </li>
+        <li>
+          <span class="checklist-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="2.25" stroke="#4A90D9" stroke-width="1.5"/>
+              <path d="M4 8.5L6.5 11L12 5.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          What your team receives after the call
+        </li>
+        <li>
+          <span class="checklist-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="2.25" stroke="#4A90D9" stroke-width="1.5"/>
+              <path d="M4 8.5L6.5 11L12 5.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          How spam filtering works
+        </li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- WHY MOVING COMPANIES LOSE CALLS -->
+  <section id="why" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">
+        You don't miss leads because you're careless. You miss them because you're busy.
+      </h2>
+
+      <div class="why-grid">
+        <div class="why-item fade-up">
+          <span class="why-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="7" width="16" height="8" rx="2" stroke="#4A90D9" stroke-width="1.5"/><rect x="4" y="4" width="7" height="5" rx="1.5" stroke="#4A90D9" stroke-width="1.5"/><circle cx="4.5" cy="15.5" r="1.5" fill="#4A90D9"/><circle cx="13.5" cy="15.5" r="1.5" fill="#4A90D9"/></svg>
+          </span>
+          You're on a truck or job site
+        </div>
+        <div class="why-item fade-up">
+          <span class="why-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5C4.86 1.5 1.5 4.86 1.5 9c0 1.32.36 2.55.99 3.6L1.5 16.5l3.9-1.98A7.47 7.47 0 0 0 9 16.5c4.14 0 7.5-3.36 7.5-7.5S13.14 1.5 9 1.5z" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9h.01M9 9h.01M12 9h.01" stroke="#4A90D9" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+          Your office line is tied up
+        </div>
+        <div class="why-item fade-up">
+          <span class="why-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="7.5" stroke="#4A90D9" stroke-width="1.5"/><path d="M9 5v4l2.5 2.5" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Leads call after hours
+        </div>
+        <div class="why-item fade-up">
+          <span class="why-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 14l4-4 3 3 5-6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Peak season hits all at once
+        </div>
+        <div class="why-item fade-up">
+          <span class="why-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="9" r="2.5" stroke="#4A90D9" stroke-width="1.5"/></svg>
+          </span>
+          Spam and vendors waste time
+        </div>
+        <div class="why-item fade-up">
+          <span class="why-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9c0-1.66 1.34-3 3-3s3 1.34 3 3" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round"/><path d="M3 9c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12" r="1.5" fill="#4A90D9"/></svg>
+          </span>
+          Shoppers call the next mover fast
+        </div>
+      </div>
+
+      <p class="why-standout fade-up">
+        Tharros isn't here to replace your team. It catches the real leads your team can't get to fast enough.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- REVENUE LOSS CALCULATOR -->
+  <section id="calculator" class="section">
+    <div class="calc-inner">
+      <h2 class="section-headline fade-up">What could missed calls be costing you?</h2>
+
+      <div class="calc-card fade-up">
+        <div class="calc-sg">
+          <div class="calc-sg-row">
+            <span class="calc-sg-label">Missed calls per day</span>
+            <span class="calc-sg-val" id="cv">5</span>
+          </div>
+          <input type="range" class="calc-range" id="calls" min="1" max="50" value="5" step="1">
+        </div>
+
+        <div class="calc-divider"></div>
+
+        <div class="calc-sg">
+          <div class="calc-sg-row">
+            <span class="calc-sg-label">Percent that become booked estimates</span>
+            <span class="calc-sg-val" id="rv">30%</span>
+          </div>
+          <input type="range" class="calc-range" id="rate" min="1" max="100" value="30" step="1">
+        </div>
+
+        <div class="calc-divider"></div>
+
+        <div class="calc-sg">
+          <div class="calc-sg-row">
+            <span class="calc-sg-label">Average booked move value</span>
+            <span class="calc-sg-val" id="pv">$800</span>
+          </div>
+          <input type="range" class="calc-range" id="price" min="100" max="10000" value="800" step="50">
+        </div>
+      </div>
+
+      <div class="calc-tabs fade-up">
+        <button class="calc-tab" data-p="daily">Daily</button>
+        <button class="calc-tab" data-p="weekly">Weekly</button>
+        <button class="calc-tab on" data-p="monthly">Monthly</button>
+        <button class="calc-tab" data-p="annually">Annually</button>
+      </div>
+
+      <div class="calc-result fade-up">
+        <div class="calc-r-label" id="rlabel">Potential booked revenue at risk per month</div>
+        <div class="calc-r-amount" id="ramt">$36,000</div>
+        <div class="calc-r-formula" id="rformula">150 missed calls × 30% booking rate × $800 avg job value</div>
+        <div class="calc-r-tagline">That's the kind of revenue Tharros is designed to catch before it disappears.</div>
+        <div class="calc-stats">
+          <div class="calc-stat">
+            <div class="calc-stat-l">Missed calls</div>
+            <div class="calc-stat-v" id="s1">150</div>
+          </div>
+          <div class="calc-stat">
+            <div class="calc-stat-l">Lost bookings</div>
+            <div class="calc-stat-v" id="s2">45</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- WHAT HAPPENS WHEN SOMEONE CALLS -->
+  <section id="steps" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">What happens when a customer calls</h2>
+
+      <div class="steps-grid">
+        <div class="step-card fade-up">
+          <div class="step-number">Step 01</div>
+          <div class="step-title">Answers Immediately</div>
+          <p class="step-body">No voicemail. No waiting for a callback. Tharros picks up right away and starts the conversation naturally.</p>
+        </div>
+        <div class="step-card fade-up">
+          <div class="step-number">Step 02</div>
+          <div class="step-title">Qualifies the Move</div>
+          <p class="step-body">Collects move date, pickup and drop-off locations, home size, urgency, contact info, and the key details your team needs.</p>
+        </div>
+        <div class="step-card fade-up">
+          <div class="step-number">Step 03</div>
+          <div class="step-title">Books &amp; Notifies Your Team</div>
+          <p class="step-body">Books the estimate on your calendar, sends the caller confirmation, and gives your team a clean summary of the call.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- CALL TRANSCRIPT EXAMPLES -->
+  <section id="transcripts" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">Real questions moving customers ask</h2>
+
+      <div class="transcripts-grid">
+        <div class="transcript-card fade-up">
+          <div class="transcript-line">
+            <div class="transcript-speaker speaker-customer">Customer</div>
+            <div class="transcript-text-customer">"I need movers next month. We're moving from a 2-bedroom apartment."</div>
+          </div>
+          <div class="transcript-line">
+            <div class="transcript-speaker speaker-ai">Tharros AI</div>
+            <div class="transcript-text-ai">"Absolutely — are you moving locally or long-distance, and what city are you moving from and to?"</div>
+          </div>
+          <div class="transcript-label">Answered fast. No voicemail.</div>
+        </div>
+
+        <div class="transcript-card fade-up">
+          <div class="transcript-line">
+            <div class="transcript-speaker speaker-customer">Customer</div>
+            <div class="transcript-text-customer">"How much would it cost to move a 3-bedroom house?"</div>
+          </div>
+          <div class="transcript-line">
+            <div class="transcript-speaker speaker-ai">Tharros AI</div>
+            <div class="transcript-text-ai">"Pricing depends on the move details, but I can collect everything the team needs to give you an accurate estimate."</div>
+          </div>
+          <div class="transcript-label">Qualified, not brushed off.</div>
+        </div>
+
+        <div class="transcript-card fade-up">
+          <div class="transcript-line">
+            <div class="transcript-speaker speaker-customer">Customer</div>
+            <div class="transcript-text-customer">"I called earlier but didn't get through."</div>
+          </div>
+          <div class="transcript-line">
+            <div class="transcript-speaker speaker-ai">Tharros AI</div>
+            <div class="transcript-text-ai">"No problem — I can still help get your move details over to the team and get you scheduled."</div>
+          </div>
+          <div class="transcript-label">Second chance, captured.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- WHAT THIS HANDLES FOR YOU -->
+  <section id="handles" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">What Tharros handles before your team gets involved</h2>
+
+      <div class="handles-grid">
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Missed calls
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          After-hours leads
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Lead qualification
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Spam &amp; vendor filtering
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Estimate booking
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Instant notifications
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Call summaries
+        </div>
+        <div class="handle-item fade-up">
+          <span class="handle-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="#4A90D9" stroke-width="1.5"/><path d="M5 8.25L7 10.25L11 6" stroke="#4A90D9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Dashboard &amp; call history
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- TRUST / FOUNDER -->
+  <section id="founder" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">
+        Built from real service-business calls — not a generic AI demo
+      </h2>
+
+      <div class="founder-body">
+        <p class="founder-p fade-up">
+          I build AI receptionist systems for service businesses that depend on inbound calls. The goal is simple: make sure real leads get answered before they disappear.
+        </p>
+
+        <div class="proof-card fade-up">
+          <div class="proof-stat">
+            <div class="proof-stat-label">First day live</div>
+            <div class="proof-stat-value"><span class="dot"></span>Real inbound lead captured automatically</div>
+          </div>
+          <div class="proof-stat">
+            <div class="proof-stat-label">Appointment booked</div>
+            <div class="proof-stat-value"><span class="dot"></span>Without office staff involved</div>
+          </div>
+          <div class="proof-stat">
+            <div class="proof-stat-label">Customer showed up</div>
+            <div class="proof-stat-value"><span class="dot"></span>The business got paid</div>
+          </div>
+          <div class="proof-stat">
+            <div class="proof-stat-label">System paid for itself</div>
+            <div class="proof-stat-value"><span class="dot"></span>From the first booked job</div>
+          </div>
+        </div>
+
+        <p class="founder-follow fade-up">
+          That first test was in another service industry. Now I'm building the same call-capture workflow specifically for moving companies — where speed-to-lead matters and customers call multiple movers fast.
+        </p>
+        <p class="founder-sig fade-up">— Lucas, Founder of Tharros AI</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- OBJECTION HANDLING -->
+  <section id="objections" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">Fair questions before you trust AI with your phones</h2>
+
+      <div class="accordion fade-up" role="list">
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-1">
+            Does it sound robotic?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-1" role="region">
+            <div class="accordion-body-inner">
+              The demo lets you judge for yourself. Tharros is designed to sound calm, professional, and natural. The bar isn't "sounds identical to a human" — it's "handles the call better than voicemail." That's the comparison that matters.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-2">
+            Will customers know it's AI?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-2" role="region">
+            <div class="accordion-body-inner">
+              That can be configured based on how you want calls handled. The goal is not to trick customers — it's to answer quickly, collect the right details, and give them a professional experience.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-3">
+            What happens with unusual situations?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-3" role="region">
+            <div class="accordion-body-inner">
+              Tharros collects what it can, flags the call, and routes the summary to your team. It doesn't guess its way through edge cases.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-4">
+            Can it transfer to a human?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-4" role="region">
+            <div class="accordion-body-inner">
+              Yes. Calls can be routed based on your rules, availability, or the type of request.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-5">
+            Does this replace my office staff?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-5" role="region">
+            <div class="accordion-body-inner">
+              No. It works best as backup for missed calls, after-hours calls, overflow, and repetitive qualification. Your team still handles the jobs that need a human.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-6">
+            How long does setup take?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-6" role="region">
+            <div class="accordion-body-inner">
+              Setup depends on your current call flow, calendar, and qualification process. On our call, we'll map out exactly what Tharros would need to answer and book calls correctly.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-7">
+            Can it book directly to my calendar?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-7" role="region">
+            <div class="accordion-body-inner">
+              Yes. Tharros can book estimates directly to your calendar and send your team the call summary. No back and forth.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item" role="listitem">
+          <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-8">
+            What if I only get a few calls a day?
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="acc-8" role="region">
+            <div class="accordion-body-inner">
+              That can still make sense if each booked move is valuable. We'll look at your call volume, missed-call rate, and average job value to see if the numbers work.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- BEFORE OUR CALL -->
+  <section id="reschedule" class="section">
+    <div class="section-inner">
+      <h2 class="section-headline fade-up">Before our call</h2>
+
+      <ul class="before-list fade-up">
+        <li>Watch the demo above</li>
+        <li>Think about how many calls go to voicemail or get missed each week</li>
+        <li>Bring your current call flow: who answers, when, and how estimates get booked</li>
+        <li>We'll walk through whether this actually makes sense for your business</li>
+      </ul>
+
+      <div class="cal-links fade-up">
+        <a href="https://calendly.com/lucas-tharrosai/ai-receptionist">Reschedule</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-wordmark">Tharros AI</div>
+      <div class="footer-tagline">Built for moving companies that can't afford to miss real inbound calls.</div>
+      <div class="footer-email">
+        <a href="mailto:inquiries@tharrosai.com">inquiries@tharrosai.com</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // ---- Scroll Fade-Up Animation ----
+    (function() {
+      const items = document.querySelectorAll('.fade-up');
+      const observer = new IntersectionObserver(
+        function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -32px 0px' }
+      );
+      items.forEach(function(el) { observer.observe(el); });
+    })();
+
+
+    // ---- Accordion ----
+    (function() {
+      const triggers = document.querySelectorAll('.accordion-trigger');
+      triggers.forEach(function(trigger) {
+        trigger.addEventListener('click', function() {
+          const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+          const targetId = trigger.getAttribute('aria-controls');
+          const body = document.getElementById(targetId);
+
+          triggers.forEach(function(t) {
+            t.setAttribute('aria-expanded', 'false');
+            const id = t.getAttribute('aria-controls');
+            const b = document.getElementById(id);
+            if (b) b.classList.remove('open');
+          });
+
+          if (!isOpen) {
+            trigger.setAttribute('aria-expanded', 'true');
+            if (body) body.classList.add('open');
+          }
+        });
+      });
+    })();
+
+
+    // ---- Revenue Loss Calculator ----
+    (function() {
+      const callsEl = document.getElementById('calls');
+      const rateEl  = document.getElementById('rate');
+      const priceEl = document.getElementById('price');
+
+      const mults = { daily: 1, weekly: 7, monthly: 30, annually: 365 };
+      const labels = {
+        daily:    ['Potential booked revenue at risk per day',   'missed calls per day'],
+        weekly:   ['Potential booked revenue at risk per week',  'missed calls per week'],
+        monthly:  ['Potential booked revenue at risk per month', 'missed calls per month'],
+        annually: ['Potential booked revenue at risk per year',  'missed calls per year'],
+      };
+      let period = 'monthly';
+
+      function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+      function updateTrack(el) {
+        const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+        el.style.background = 'linear-gradient(to right, #4A90D9 ' + pct + '%, #2a2a2a ' + pct + '%)';
+      }
+
+      function calc() {
+        const c = +callsEl.value, r = +rateEl.value / 100, p = +priceEl.value;
+        const days = mults[period];
+        const missed = c * days;
+        const converted = Math.round(missed * r);
+        const lost = missed * r * p;
+        const rateDisplay = rateEl.value + '%';
+        const priceDisplay = '$' + (+priceEl.value).toLocaleString('en-US');
+
+        document.getElementById('cv').textContent = c;
+        document.getElementById('rv').textContent = rateDisplay;
+        document.getElementById('pv').textContent = priceDisplay;
+        document.getElementById('ramt').textContent = fmt(lost);
+        document.getElementById('rlabel').textContent = labels[period][0];
+        document.getElementById('rformula').textContent =
+          missed.toLocaleString() + ' missed calls × ' + rateDisplay + ' booking rate × ' + priceDisplay + ' avg job value';
+        document.getElementById('s1').textContent = missed.toLocaleString();
+        document.getElementById('s2').textContent = converted.toLocaleString();
+
+        [callsEl, rateEl, priceEl].forEach(updateTrack);
+      }
+
+      [callsEl, rateEl, priceEl].forEach(function(el) {
+        el.addEventListener('input', calc);
+      });
+
+      document.querySelectorAll('.calc-tab').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.calc-tab').forEach(function(t) { t.classList.remove('on'); });
+          btn.classList.add('on');
+          period = btn.dataset.p;
+          calc();
+        });
+      });
+
+      calc();
+    })();
+  </script>
+
+</body>
+</html>
