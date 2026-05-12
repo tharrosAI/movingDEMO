@@ -306,6 +306,51 @@
       letter-spacing: 0.02em;
     }
 
+
+    /* ---- Video overlay ---- */
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 11px;
+      overflow: hidden;
+      transition: opacity 0.35s ease;
+    }
+
+    .video-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .video-overlay-thumb {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-overlay-gradient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 55%, rgba(74,144,217,0.09) 0%, rgba(12,12,12,0.72) 60%, rgba(10,10,10,0.92) 100%);
+    }
+
+    .video-overlay-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+      padding: 24px;
+    }
+
     /* =========================================
        DEMO CHECKLIST — directly under video
     ========================================= */
@@ -963,14 +1008,47 @@
   <!-- VIDEO SECTION -->
   <section id="video">
     <div class="video-inner">
-      <div class="video-wrapper fade-up">
+      <div class="video-wrapper fade-up" id="videoContainer">
+
+        <!-- Real video — controls revealed after overlay is dismissed -->
         <video
-          src="https://raw.githubusercontent.com/tharrosAI/movingDEMO/main/Mover%20VSL%20(1).mp4"
-          controls
+          id="demoVideo"
+          src="https://raw.githubusercontent.com/tharrosAI/movingDEMO/main/Mover%20VSL%20%281%29.mp4"
           style="width:100%;height:100%;object-fit:cover;display:block;"
           preload="metadata"
         ></video>
-        <div class="video-duration-badge">1:30 demo</div>
+
+        <!-- Custom overlay — click anywhere to play -->
+        <div class="video-overlay" id="videoOverlay" role="button" aria-label="Play demo video" tabindex="0">
+
+          <!-- Thumbnail image. If video-thumbnail.jpg is missing, CSS gradient shows instead -->
+          <img
+            class="video-overlay-thumb"
+            src="video-thumbnail.jpg"
+            alt=""
+            aria-hidden="true"
+            onerror="this.style.display='none'"
+          >
+
+          <!-- Dark gradient on top of thumbnail (or alone if no image) -->
+          <div class="video-overlay-gradient"></div>
+
+          <!-- Top-left badge -->
+          <div class="video-duration-badge">1:30 DEMO</div>
+
+          <!-- Centered content -->
+          <div class="video-overlay-content">
+            <div class="video-play-btn" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="video-placeholder-text">
+              <div class="video-placeholder-title">Watch the 90-second demo</div>
+              <div class="video-placeholder-sub">Hear a moving lead get answered, qualified, and booked automatically.</div>
+            </div>
+          </div>
+
+        </div><!-- /video-overlay -->
+
       </div>
 
       <p class="video-caption fade-up">Real call flow. Real lead qualification. Booked automatically.</p>
@@ -1555,6 +1633,25 @@
 
       calc();
     })();
+
+    // ---- Video Overlay ----
+    (function() {
+      var overlay = document.getElementById('videoOverlay');
+      var video   = document.getElementById('demoVideo');
+      if (!overlay || !video) return;
+
+      function playVideo() {
+        overlay.classList.add('hidden');
+        video.setAttribute('controls', '');
+        video.play();
+      }
+
+      overlay.addEventListener('click', playVideo);
+      overlay.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playVideo(); }
+      });
+    })();
+
   </script>
 
 </body>
